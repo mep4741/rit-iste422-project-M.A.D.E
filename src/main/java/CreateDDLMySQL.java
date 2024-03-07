@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory;
 public class CreateDDLMySQL extends EdgeConvertCreateDDL {
 
    //The class logger.
-   private static final Logger logger = LoggerFactory.getLogger();
+   private static final Logger logger = LoggerFactory.getLogger(CreateDDLMySQL.class);
 
    protected String databaseName;
    //this array is for determining how MySQL refers to datatypes
@@ -105,7 +105,7 @@ public class CreateDDLMySQL extends EdgeConvertCreateDDL {
             }
          }
       }
-      logger.debug("--- SQL commands ---\r\n"+sb.toString)
+      logger.debug("--- SQL commands ---\r\n"+sb.toString());
    }
 
    protected int convertStrBooleanToInt(String input) { //MySQL uses '1' and '0' for boolean types
