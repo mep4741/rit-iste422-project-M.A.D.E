@@ -5,7 +5,13 @@ import javax.swing.event.*;
 import java.io.*;
 import java.util.*;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class CreateDDLMySQL extends EdgeConvertCreateDDL {
+
+   //The class logger.
+   private static final Logger logger = LoggerFactory.getLogger(CreateDDLMySQL);
 
    protected String databaseName;
    //this array is for determining how MySQL refers to datatypes
@@ -24,6 +30,7 @@ public class CreateDDLMySQL extends EdgeConvertCreateDDL {
    public void createDDL() {
       EdgeConvertGUI.setReadSuccess(true);
       databaseName = generateDatabaseName();
+      logger.info("Beginning Database Creation...");
       sb.append("CREATE DATABASE " + databaseName + ";\r\n");
       sb.append("USE " + databaseName + ";\r\n");
       for (int boundCount = 0; boundCount <= maxBound; boundCount++) { //process tables in order from least dependent (least number of bound tables) to most dependent
@@ -126,6 +133,7 @@ public class CreateDDLMySQL extends EdgeConvertCreateDDL {
             return "";
          }
          if (databaseName.equals("")) {
+            logger.warn("You must select a name for your database.");
             JOptionPane.showMessageDialog(null, "You must select a name for your database.");
          }
       } while (databaseName.equals(""));
