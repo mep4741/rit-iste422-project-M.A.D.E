@@ -1,15 +1,24 @@
 import java.util.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;;
 
 public class EdgeTable {
    private int numFigure;
    private String name;
    private ArrayList alRelatedTables, alNativeFields;
    private int[] relatedTables, relatedFields, nativeFields;
+
+   private final Logger logger = LoggerFactory.getLogger(EdgeTable.class);
    
    public EdgeTable(String inputString) {
-      StringTokenizer st = new StringTokenizer(inputString, EdgeConvertFileParser.DELIM);
+      logger.debug("Creating New EdgeTable: "+this.name+"\nInput String: ",inputString);
+      try{StringTokenizer st = new StringTokenizer(inputString, EdgeConvertFileParser.DELIM);
       numFigure = Integer.parseInt(st.nextToken());
       name = st.nextToken();
+      }catch(ArrayIndexOutOfBoundsException e){
+         logger.error("Error in "+EdgeTable.class+" constructor. Input lacks necessary amount of tokens. \n"+
+         "\nException Caught: "+e+"\n\rstacktrace:\n"+e.getStackTrace(), e);
+      }
       alRelatedTables = new ArrayList();
       alNativeFields = new ArrayList();
    }
