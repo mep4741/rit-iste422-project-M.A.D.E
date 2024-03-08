@@ -2,7 +2,12 @@ import java.io.*;
 import java.util.*;
 import javax.swing.*;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;;
+
 public class EdgeConvertFileParser {
+   private final Logger logger = LoggerFactory.getLogger(EdgeConvertFileParser.class);
+
    //private String filename = "test.edg";
    private File parseFile;
    private FileReader fr;
@@ -299,15 +304,20 @@ public class EdgeConvertFileParser {
                br.close();
                this.makeArrays(); //convert ArrayList objects into arrays of the appropriate Class type
             } else { //the file chosen is something else
+               logger.warn("File: \'"+inputFile.getName()+"\' is not a recognized file format.");
                JOptionPane.showMessageDialog(null, "Unrecognized file format");
             }
          }
       } // try
       catch (FileNotFoundException fnfe) {
+         logger.error("Cannot find \"" + inputFile.getName() + "\".");
+         logger.debug("stacktrace:\n"+fnfe.getStackTrace());
          System.out.println("Cannot find \"" + inputFile.getName() + "\".");
          System.exit(0);
       } // catch FileNotFoundException
       catch (IOException ioe) {
+         logger.error("Experienced an Input/Output exception. Error:\n"+
+         ioe+"\n\nstacktrace:\n"+ioe.getStackTrace());
          System.out.println(ioe);
          System.exit(0);
       } // catch IOException
