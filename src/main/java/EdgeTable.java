@@ -1,6 +1,6 @@
 import java.util.*;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;;
+import org.slf4j.LoggerFactory;
 
 public class EdgeTable {
    private int numFigure;
@@ -11,16 +11,21 @@ public class EdgeTable {
    private final Logger logger = LoggerFactory.getLogger(EdgeTable.class);
    
    public EdgeTable(String inputString) {
-      logger.debug("Creating New EdgeTable: "+this.name+"\nInput String: ",inputString);
-      try{StringTokenizer st = new StringTokenizer(inputString, EdgeConvertFileParser.DELIM);
-      numFigure = Integer.parseInt(st.nextToken());
-      name = st.nextToken();
-      }catch(ArrayIndexOutOfBoundsException e){
-         logger.error("Error in "+EdgeTable.class+" constructor. Input lacks necessary amount of tokens. \n"+
-         "\nException Caught: "+e+"\n\rstacktrace:\n"+e.getStackTrace(), e);
+      try{
+         ArgumentNullException.throwIfNull(null, inputString);
+         logger.debug("Creating New EdgeTable: "+this.name+"\nInput String: ",inputString);
+         try{StringTokenizer st = new StringTokenizer(inputString, EdgeConvertFileParser.DELIM);
+         numFigure = Integer.parseInt(st.nextToken());
+         name = st.nextToken();
+         }catch(ArrayIndexOutOfBoundsException e){
+            logger.error("Error in "+EdgeTable.class+" constructor. Input lacks necessary amount of tokens. \n"+
+            "\nException Caught: "+e+"\n\rstacktrace:\n"+e.getStackTrace(), e);
+         }
+         alRelatedTables = new ArrayList();
+         alNativeFields = new ArrayList();
+      } catch (ArgumentNullException e){
+
       }
-      alRelatedTables = new ArrayList();
-      alNativeFields = new ArrayList();
    }
    
    public int getNumFigure() {
