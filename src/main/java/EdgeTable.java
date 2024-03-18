@@ -12,7 +12,7 @@ public class EdgeTable {
    
    public EdgeTable(String inputString) {
       try{
-         ArgumentNullException.throwIfNull(null, inputString);
+         ArgumentNullException.throwIfNull(inputString, "inputString");
          logger.debug("Creating New EdgeTable: "+this.name+"\nInput String: ",inputString);
          try{StringTokenizer st = new StringTokenizer(inputString, EdgeConvertFileParser.DELIM);
          numFigure = Integer.parseInt(st.nextToken());
@@ -37,7 +37,12 @@ public class EdgeTable {
    }
    
    public void addRelatedTable(int relatedTable) {
-      alRelatedTables.add(new Integer(relatedTable));
+      try{
+         ArgumentNullException.throwIfNull(relatedTable, "relatedTable");
+         alRelatedTables.add(new Integer(relatedTable));
+      } catch (ArgumentNullException e){
+         e.printStackTrace();
+      }
    }
    
    public int[] getRelatedTablesArray() {
@@ -49,7 +54,13 @@ public class EdgeTable {
    }
    
    public void setRelatedField(int index, int relatedValue) {
-      relatedFields[index] = relatedValue;
+      try{
+         ArgumentNullException.throwIfNull(index, "index");
+         ArgumentNullException.throwIfNull(relatedValue, "relatedValue");
+         relatedFields[index] = relatedValue;
+      } catch (ArgumentNullException e){
+         e.printStackTrace();
+      }
    }
    
    public int[] getNativeFieldsArray() {

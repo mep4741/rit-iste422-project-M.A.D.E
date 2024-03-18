@@ -44,6 +44,9 @@ import java.util.Enumeration;
 import javax.swing.*;
 import javax.swing.filechooser.*;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * A convenience implementation of FileFilter that filters out
  * all files except for those type extensions that it knows about.
@@ -64,6 +67,8 @@ import javax.swing.filechooser.*;
  * @author Jeff Dinkins
  */
 public class ExampleFileFilter extends FileFilter {
+
+    private Logger logger = LoggerFactory.getLogger(ExampleFileFilter.class);
 
     private static String TYPE_UNKNOWN = "Type Unknown";
     private static String HIDDEN_FILE = "Hidden File";
