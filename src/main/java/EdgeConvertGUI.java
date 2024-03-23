@@ -1,5 +1,5 @@
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -14,7 +14,7 @@ import java.lang.reflect.*;
 
 public class EdgeConvertGUI {
 
-   private static final Logger logger = LoggerFactory.getLogger(EdgeConvertGUI.class);
+   private static final Logger logger = LogManager.getLogger(EdgeConvertGUI.class);
    public static final int HORIZ_SIZE = 635;
    public static final int VERT_SIZE = 400;
    public static final int HORIZ_LOC = 100;
@@ -87,7 +87,6 @@ public class EdgeConvertGUI {
          UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName()); //use the OS native LAF, as opposed to default Java LAF
       } catch (Exception e) {
          logger.error("Error setting native LAF, Exception Caught: " + e + ", stacktrace: \n" + e.getStackTrace());
-         System.out.println("Error setting native LAF: " + e);
       }
       createDTScreen();
       createDRScreen();
@@ -925,10 +924,11 @@ public class EdgeConvertGUI {
             pw.close();
          } catch (IOException ioe) {
             logger.error("IO Exception: " + ioe + ", stacktrace: \n" + ioe.getStackTrace());
-            System.out.println(ioe);
          }
          dataSaved = true;
       }
+      logger.info("Saved SQL");
+
    }
 
    private void setOutputDir() {
@@ -985,7 +985,6 @@ public class EdgeConvertGUI {
       String classLocation = EdgeConvertGUI.class.getResource("EdgeConvertGUI.class").toString();
       if (classLocation.startsWith("jar:")) {
           String jarfilename = classLocation.replaceFirst("^.*:", "").replaceFirst("!.*$", "");
-          System.out.println("Jarfile: " + jarfilename);
           try (JarFile jarfile = new JarFile(jarfilename)) {
               ArrayList<File> filenames = new ArrayList<>();
               for (JarEntry e : Collections.list(jarfile.entries())) {
@@ -1004,7 +1003,6 @@ public class EdgeConvertGUI {
       alSubclasses.clear();
       try {
          for (int i = 0; i < resultFiles.length; i++) {
-         System.out.println(resultFiles[i].getName());
             if (!resultFiles[i].getName().endsWith(".class")) {
                continue; //ignore all files that are not .class files
             }
@@ -1118,7 +1116,6 @@ public class EdgeConvertGUI {
             pw.close();
          } catch (IOException ioe) {
             logger.error("IOException, " + ioe + ", stacktrace: \n" + ioe.getStackTrace());
-            System.out.println(ioe);
          }
       }
    }
@@ -1211,6 +1208,7 @@ public class EdgeConvertGUI {
             returnVal = jfcEdge.showOpenDialog(null);
             if (returnVal == JFileChooser.APPROVE_OPTION) {
                parseFile = jfcEdge.getSelectedFile();
+               logger.info("Opening edg file");
                ecfp = new EdgeConvertFileParser(parseFile);
                tables = ecfp.getEdgeTables();
                for (int i = 0; i < tables.length; i++) {

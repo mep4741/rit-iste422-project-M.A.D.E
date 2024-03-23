@@ -44,8 +44,8 @@ import java.util.Enumeration;
 import javax.swing.*;
 import javax.swing.filechooser.*;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * A convenience implementation of FileFilter that filters out
@@ -68,7 +68,7 @@ import org.slf4j.LoggerFactory;
  */
 public class ExampleFileFilter extends FileFilter {
 
-    private Logger logger = LoggerFactory.getLogger(ExampleFileFilter.class);
+	private static final Logger logger = LogManager.getLogger(ExampleFileFilter.class);
 
     private static String TYPE_UNKNOWN = "Type Unknown";
     private static String HIDDEN_FILE = "Hidden File";

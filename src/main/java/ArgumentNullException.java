@@ -1,6 +1,8 @@
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+
+import java.rmi.server.LoaderHandler;
 
 public class ArgumentNullException extends Exception {
     /**
@@ -38,7 +40,11 @@ public class ArgumentNullException extends Exception {
             StackTraceElement element = stackTrace[2];
 
             // Auto-log when this exception is thrown
-            LoggerFactory.getLogger(element.getClass()).instance().forClass().error("An exception was thrown by method: " + element.getMethodName());
+            // LoggerFactory.getLogger(element.getClass()).error("An exception was thrown by method: " + element.getMethodName());
+
+            Logger logger = LogManager.getLogger(element.getClass());
+            logger.error("An exception was thrown by method: " + element.getMethodName());
+
             throw new ArgumentNullException(String.format(ARGUMENT_NULL_EXCEPTION_ERROR, param));
         }
     }

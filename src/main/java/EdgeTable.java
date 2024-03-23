@@ -1,6 +1,6 @@
 import java.util.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class EdgeTable {
    private int numFigure;
@@ -8,7 +8,7 @@ public class EdgeTable {
    private ArrayList alRelatedTables, alNativeFields;
    private int[] relatedTables, relatedFields, nativeFields;
 
-   private final Logger logger = LoggerFactory.getLogger(EdgeTable.class);
+   private static final Logger logger = LogManager.getLogger(RunEdgeConvert.class);
    
    public EdgeTable(String inputString) {
       try{

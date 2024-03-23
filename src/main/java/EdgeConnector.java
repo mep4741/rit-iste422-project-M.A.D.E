@@ -1,11 +1,12 @@
 import java.util.StringTokenizer;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 
 public class EdgeConnector {
 
-   private static final Logger logger = LoggerFactory.getLogger(EdgeConnector.class);
+   private static final Logger logger = LogManager.getLogger(EdgeConnector.class);
    private int numConnector, endPoint1, endPoint2;
    private String endStyle1, endStyle2;
    private boolean isEP1Field, isEP2Field, isEP1Table, isEP2Table;
