@@ -6,16 +6,23 @@ import java.util.Arrays;
 
 
 public class EdgeConvertFileParserTest {
-    EdgeConvertFileParser testObj;
+    EdgeConvertFileParser edgeTestObj;
+    EdgeConvertFileParser saveTestObj;
 
     @Before
     public void setUp() throws Exception{
         //Begin by testing a save file.
-        testObj = new EdgeConvertFileParser(null);
+        saveTestObj = new EdgeConvertFileParser(null);
+        edgeTestObj = new EdgeConvertFileParser(null);
     } //setUp
 
     @Test
     public void testParseSaveFile(){
         
+    }
+
+    @Test
+    public void testIsTableDup_yes(){
+        //Tests if a table passed is a duplicate of the one stored in the edge table.
     }
 }
