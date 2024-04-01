@@ -7,6 +7,7 @@ import java.util.Arrays;
 
 public class EdgeConvertFileParserTest {
     EdgeConvertFileParser edgeTestObj;
+    EdgeTable edgeTableTestObj;
     EdgeConvertFileParser saveTestObj;
 
     @Before

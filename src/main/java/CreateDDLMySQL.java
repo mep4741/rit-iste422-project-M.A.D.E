@@ -151,7 +151,7 @@ public class CreateDDLMySQL extends EdgeConvertCreateDDL {
 
    public String getSQLString() {
       createDDL();
-      return sb.toString();
+      return sb.toString(); //output of get ddl
    }
    
 }//EdgeConvertCreateDDL
