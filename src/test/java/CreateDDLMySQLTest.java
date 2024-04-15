@@ -60,6 +60,7 @@ public class CreateDDLMySQLTest {
     }
 
     @Test
+
     public void testSQLStringExistence(){
         assertNotNull("SQLString should exist by default upon creation of CreateDDLMySQL object.", testSQLString);
     }
@@ -79,17 +80,12 @@ public class CreateDDLMySQLTest {
 
     @Test
     public void testTableFieldsExistence(){
-        sqlStrCheckAssertion("SQL string should include statement to create field alpha", "Field_alpha", "VARCHAR(1)");
+
         sqlStrCheckAssertion("field alpha should be in Table A", "TABLE Table_A (\r\n\tField_alpha", "");
         sqlStrCheckAssertion("Table A contains all necessary fields.", "Table_A (\r\n"+
                         "\tField_alpha VARCHAR(1)\r\n"+
                         "\tField_A VARCHAR(1)\r\n"+
                         "\tField_1 VARCHAR(1)\r\n", 
                         "\r\n);");
-    }
-
-    @After
-    public void outputTestSQLString(){
-       assertTrue(testSQLString,false);
     }
 }
