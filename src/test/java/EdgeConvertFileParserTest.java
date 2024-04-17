@@ -13,8 +13,8 @@ public class EdgeConvertFileParserTest {
     @Before
     public void setUp() throws Exception{
         //Begin by testing a save file.
-        saveTestObj = new EdgeConvertFileParser(null);
-        edgeTestObj = new EdgeConvertFileParser(null);
+        saveTestObj = new SaveFile(null);
+        edgeTestObj = new EdgeFile(null);
     } //setUp
 
     @Test
