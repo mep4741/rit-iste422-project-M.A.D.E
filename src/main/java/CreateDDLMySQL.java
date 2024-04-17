@@ -5,7 +5,13 @@ import javax.swing.event.*;
 import java.io.*;
 import java.util.*;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 public class CreateDDLMySQL extends EdgeConvertCreateDDL {
+
+   //The class logger.
+   private static final Logger logger = LogManager.getLogger(CreateDDLMySQL.class);
 
    protected String databaseName;
    //this array is for determining how MySQL refers to datatypes
@@ -24,6 +30,7 @@ public class CreateDDLMySQL extends EdgeConvertCreateDDL {
    public void createDDL() {
       EdgeConvertGUI.setReadSuccess(true);
       databaseName = generateDatabaseName();
+      logger.info("Beginning Database Creation...");
       sb.append("CREATE DATABASE " + databaseName + ";\r\n");
       sb.append("USE " + databaseName + ";\r\n");
       for (int boundCount = 0; boundCount <= maxBound; boundCount++) { //process tables in order from least dependent (least number of bound tables) to most dependent
@@ -98,6 +105,7 @@ public class CreateDDLMySQL extends EdgeConvertCreateDDL {
             }
          }
       }
+      logger.debug("--- SQL commands ---\r\n"+sb.toString());
    }
 
    protected int convertStrBooleanToInt(String input) { //MySQL uses '1' and '0' for boolean types
@@ -126,6 +134,7 @@ public class CreateDDLMySQL extends EdgeConvertCreateDDL {
             return "";
          }
          if (databaseName.equals("")) {
+            logger.warn("You must select a name for your database.");
             JOptionPane.showMessageDialog(null, "You must select a name for your database.");
          }
       } while (databaseName.equals(""));
@@ -142,7 +151,7 @@ public class CreateDDLMySQL extends EdgeConvertCreateDDL {
 
    public String getSQLString() {
       createDDL();
-      return sb.toString();
+      return sb.toString(); //output of get ddl
    }
    
 }//EdgeConvertCreateDDL

@@ -6,7 +6,7 @@ rm -f *.class
 find . -name \*.class -exec rm {} \;
 
 echo "Compiling source code and unit tests..."
-javac -d build -cp lib/junit-4.12.jar:lib/hamcrest-core-1.3.jar src/main/java/*.java src/test/java/*.java
+javac -d build -cp lib/junit-4.12.jar:lib/hamcrest-core-1.3.jar:lib/slf4j-api-1.7.25.jar src/main/java/*.java src/test/java/*.java
 if [ $? -ne 0 ] ; then echo BUILD FAILED!; exit 1; fi
 
 echo "Running unit tests..."

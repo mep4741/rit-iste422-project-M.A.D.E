@@ -4,8 +4,12 @@ import javax.swing.*;
 import javax.swing.event.*;
 import java.io.*;
 import java.util.*;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public abstract class EdgeConvertCreateDDL {
+   private static final Logger logger = LogManager.getLogger(EdgeConvertCreateDDL.class);
+
    static String[] products = {"MySQL"};
    protected EdgeTable[] tables; //master copy of EdgeTable objects
    protected EdgeField[] fields; //master copy of EdgeField objects
@@ -25,6 +29,7 @@ public abstract class EdgeConvertCreateDDL {
    } //EdgeConvertCreateDDL()
 
    public void initialize() {
+      logger.info("Initializing DDL");
       numBoundTables = new int[tables.length];
       maxBound = 0;
       sb = new StringBuffer();
@@ -40,6 +45,9 @@ public abstract class EdgeConvertCreateDDL {
          numBoundTables[i] = numBound;
          if (numBound > maxBound) {
             maxBound = numBound;
+         }
+         else{
+            logger.warn("numBound is less than maxBound");
          }
       }
    }

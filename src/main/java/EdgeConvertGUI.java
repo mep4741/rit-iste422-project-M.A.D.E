@@ -1,3 +1,6 @@
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
@@ -10,7 +13,8 @@ import java.util.jar.JarFile;
 import java.lang.reflect.*;
 
 public class EdgeConvertGUI {
-   
+
+   private static final Logger logger = LogManager.getLogger(EdgeConvertGUI.class);
    public static final int HORIZ_SIZE = 635;
    public static final int VERT_SIZE = 400;
    public static final int HORIZ_LOC = 100;
@@ -82,7 +86,7 @@ public class EdgeConvertGUI {
       try {
          UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName()); //use the OS native LAF, as opposed to default Java LAF
       } catch (Exception e) {
-         System.out.println("Error setting native LAF: " + e);
+         logger.error("Error setting native LAF, Exception Caught: " + e + ", stacktrace: \n" + e.getStackTrace());
       }
       createDTScreen();
       createDRScreen();
@@ -359,6 +363,7 @@ public class EdgeConvertGUI {
                            jtfDTDefaultValue.setText(result);
                            goodData = true;
                         } else {
+                           logger.warn("Varchar entered is not long enough");
                            JOptionPane.showMessageDialog(null, "The length of this value must be less than or equal to the Varchar length specified.");
                         }
                         break;
@@ -368,6 +373,7 @@ public class EdgeConvertGUI {
                            jtfDTDefaultValue.setText(newResult);
                            goodData = true;
                         } else {
+                           logger.warn("Entered value is not a valid boolean value");
                            JOptionPane.showMessageDialog(null, "You must input a valid boolean value (\"true\" or \"false\").");
                         }
                         break;
@@ -377,6 +383,7 @@ public class EdgeConvertGUI {
                            jtfDTDefaultValue.setText(result);
                            goodData = true;
                         } catch (NumberFormatException nfe) {
+                           logger.warn("Entered value is not an integer");
                            JOptionPane.showMessageDialog(null, "\"" + result + "\" is not an integer or is outside the bounds of valid integer values.");
                         }
                         break;
@@ -386,6 +393,7 @@ public class EdgeConvertGUI {
                            jtfDTDefaultValue.setText(result);
                            goodData = true;
                         } catch (NumberFormatException nfe) {
+                           logger.warn("Entered value is not a double");
                            JOptionPane.showMessageDialog(null, "\"" + result + "\" is not a double or is outside the bounds of valid double values.");
                         }
                         break;
@@ -395,7 +403,7 @@ public class EdgeConvertGUI {
                            goodData = true;
                         }
                         catch (Exception e) {
-                           
+                           logger.error("Exception " + e + " caught (Edge Convert GUI, line 406), stacktrace: \n" + e.getStackTrace());
                         }
                         break;
                   }
@@ -449,6 +457,7 @@ public class EdgeConvertGUI {
                      return;
                   }
                } catch (NumberFormatException nfe) {
+                  logger.info("Number Format Exception caught: " + nfe.getMessage());
                   JOptionPane.showMessageDialog(null, "\"" + result + "\" is not a number");
                   jtfDTVarchar.setText(Integer.toString(EdgeField.VARCHAR_DEFAULT_LENGTH));
                   return;
@@ -914,10 +923,12 @@ public class EdgeConvertGUI {
             //close the file
             pw.close();
          } catch (IOException ioe) {
-            System.out.println(ioe);
+            logger.error("IO Exception: " + ioe + ", stacktrace: \n" + ioe.getStackTrace());
          }
          dataSaved = true;
       }
+      logger.info("Saved SQL");
+
    }
 
    private void setOutputDir() {
@@ -974,7 +985,6 @@ public class EdgeConvertGUI {
       String classLocation = EdgeConvertGUI.class.getResource("EdgeConvertGUI.class").toString();
       if (classLocation.startsWith("jar:")) {
           String jarfilename = classLocation.replaceFirst("^.*:", "").replaceFirst("!.*$", "");
-          System.out.println("Jarfile: " + jarfilename);
           try (JarFile jarfile = new JarFile(jarfilename)) {
               ArrayList<File> filenames = new ArrayList<>();
               for (JarEntry e : Collections.list(jarfile.entries())) {
@@ -982,6 +992,7 @@ public class EdgeConvertGUI {
               }
               resultFiles = filenames.toArray(new File[0]);
           } catch (IOException ioe) {
+             logger.error("Caught IO Exception, throwing RuntimeException.... \n " + ioe + ", stacktrace: \n" + ioe.getStackTrace());
               throw new RuntimeException(ioe);
           }
       } 
@@ -992,7 +1003,6 @@ public class EdgeConvertGUI {
       alSubclasses.clear();
       try {
          for (int i = 0; i < resultFiles.length; i++) {
-         System.out.println(resultFiles[i].getName());
             if (!resultFiles[i].getName().endsWith(".class")) {
                continue; //ignore all files that are not .class files
             }
@@ -1012,14 +1022,19 @@ public class EdgeConvertGUI {
             }
          }
       } catch (InstantiationException ie) {
+         logger.error("InstantiationException caught, " + ie + ", stacktrace: \n" + ie.getStackTrace());
          ie.printStackTrace();
       } catch (ClassNotFoundException cnfe) {
+         logger.error("ClassNotFoundException caught, " + cnfe + ", stacktrace: \n" + cnfe.getStackTrace());
          cnfe.printStackTrace();
       } catch (IllegalAccessException iae) {
+         logger.error("IllegalAccessException caught, " + iae + ", stacktrace: \n" + iae.getStackTrace());
          iae.printStackTrace();
       } catch (NoSuchMethodException nsme) {
+         logger.error("NoSuchMethodException caught, " + nsme + ", stacktrace: \n" + nsme.getStackTrace());
          nsme.printStackTrace();
       } catch (InvocationTargetException ite) {
+         logger.error("InvocationTargetException caught, " + ite + ", stacktrace: \n" + ite.getStackTrace());
          ite.printStackTrace();
       }
       if (alProductNames.size() > 0 && alSubclasses.size() > 0) { //do not recreate productName and objSubClasses arrays if the new path is empty of valid files
@@ -1057,10 +1072,13 @@ public class EdgeConvertGUI {
          strSQLString = (String)getSQLString.invoke(objSubclasses[selected], null);
          databaseName = (String)getDatabaseName.invoke(objSubclasses[selected], null);
       } catch (IllegalAccessException iae) {
+         logger.error("IllegalAccessException, " + iae + ", stacktrace: \n" + iae.getStackTrace());
          iae.printStackTrace();
       } catch (NoSuchMethodException nsme) {
+         logger.error("NoSuchMethodException, " + nsme + ", stacktrace: \n" + nsme.getStackTrace());
          nsme.printStackTrace();
       } catch (InvocationTargetException ite) {
+         logger.error("InvocationTargetException, " + ite + ", stacktrace: \n" + ite.getStackTrace());
          ite.printStackTrace();
       }
 
@@ -1068,6 +1086,7 @@ public class EdgeConvertGUI {
    }
 
    private void writeSQL(String output) {
+      logger.info("Attempting to write SQL...");
       jfcEdge.resetChoosableFileFilters();
       String str;
       if (parseFile != null) {
@@ -1096,7 +1115,7 @@ public class EdgeConvertGUI {
             //close the file
             pw.close();
          } catch (IOException ioe) {
-            System.out.println(ioe);
+            logger.error("IOException, " + ioe + ", stacktrace: \n" + ioe.getStackTrace());
          }
       }
    }
@@ -1131,6 +1150,7 @@ public class EdgeConvertGUI {
       public void windowOpened(WindowEvent we) {}
       
       public void windowClosing(WindowEvent we) {
+         logger.info("Window Closing...");
          if (!dataSaved) {
             int answer = JOptionPane.showOptionDialog(null,
                 "You currently have unsaved data. Would you like to save?",
@@ -1188,6 +1208,7 @@ public class EdgeConvertGUI {
             returnVal = jfcEdge.showOpenDialog(null);
             if (returnVal == JFileChooser.APPROVE_OPTION) {
                parseFile = jfcEdge.getSelectedFile();
+               logger.info("Opening edg file");
                ecfp = new EdgeConvertFileParser(parseFile);
                tables = ecfp.getEdgeTables();
                for (int i = 0; i < tables.length; i++) {

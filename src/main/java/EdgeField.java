@@ -1,3 +1,6 @@
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.util.StringTokenizer;
 
 public class EdgeField {
@@ -6,8 +9,13 @@ public class EdgeField {
    private boolean disallowNull, isPrimaryKey;
    private static String[] strDataType = {"Varchar", "Boolean", "Integer", "Double"};
    public static final int VARCHAR_DEFAULT_LENGTH = 1;
-   
+   private static final Logger logger = LogManager.getLogger(EdgeField.class);
+
+
    public EdgeField(String inputString) {
+      if(inputString == null){
+         logger.warn("Input String for EdgeField is null.");
+      }
       StringTokenizer st = new StringTokenizer(inputString, EdgeConvertFileParser.DELIM);
       numFigure = Integer.parseInt(st.nextToken());
       name = st.nextToken();
@@ -34,6 +42,7 @@ public class EdgeField {
    }
    
    public void setTableID(int value) {
+
       tableID = value;
    }
    
@@ -84,6 +93,9 @@ public class EdgeField {
    public void setVarcharValue(int value) {
       if (value > 0) {
          varcharValue = value;
+      }
+      else{
+         logger.warn("Value in setVarCharValue is less than or equal to 0");
       }
    }
    public int getDataType() {

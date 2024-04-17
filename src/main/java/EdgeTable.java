@@ -1,17 +1,35 @@
 import java.util.*;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class EdgeTable {
    private int numFigure;
    private String name;
    private ArrayList alRelatedTables, alNativeFields;
    private int[] relatedTables, relatedFields, nativeFields;
+
+   private static final Logger logger = LogManager.getLogger(RunEdgeConvert.class);
    
    public EdgeTable(String inputString) {
-      StringTokenizer st = new StringTokenizer(inputString, EdgeConvertFileParser.DELIM);
-      numFigure = Integer.parseInt(st.nextToken());
-      name = st.nextToken();
-      alRelatedTables = new ArrayList();
-      alNativeFields = new ArrayList();
+      try{
+         ArgumentNullException.throwIfNull(inputString, "inputString");
+         logger.debug("Creating New EdgeTable: "+this.name+"\nInput String: ",inputString);
+         try{
+            StringTokenizer st = new StringTokenizer(inputString, EdgeConvertFileParser.DELIM);
+            numFigure = Integer.parseInt(st.nextToken());
+            name = st.nextToken();
+         } catch(ArrayIndexOutOfBoundsException e){
+            logger.error("Error in "+EdgeTable.class+" constructor. Input lacks necessary amount of tokens. \n"+
+            "\nException Caught: "+e+"\n\rstacktrace:\n"+e.getStackTrace(), e);
+         } catch (NumberFormatException e) {
+            logger.error("Error in "+EdgeTable.class+" constructor. First token of input must be an integer. Use '|' to separate params \n"+
+                    "\nException Caught: "+e+"\n\rstacktrace:\n"+e.getStackTrace(), e);
+         }
+         alRelatedTables = new ArrayList();
+         alNativeFields = new ArrayList();
+      } catch (ArgumentNullException e){
+
+      }
    }
    
    public int getNumFigure() {
@@ -23,7 +41,13 @@ public class EdgeTable {
    }
    
    public void addRelatedTable(int relatedTable) {
-      alRelatedTables.add(new Integer(relatedTable));
+      try{
+         ArgumentNullException.throwIfNull(relatedTable, "relatedTable");
+         //alRelatedTables.add(new Integer(relatedTable));
+         alRelatedTables.add(relatedTable);
+      } catch (ArgumentNullException e){
+         e.printStackTrace();
+      }
    }
    
    public int[] getRelatedTablesArray() {
@@ -35,7 +59,13 @@ public class EdgeTable {
    }
    
    public void setRelatedField(int index, int relatedValue) {
-      relatedFields[index] = relatedValue;
+      try{
+         ArgumentNullException.throwIfNull(index, "index");
+         ArgumentNullException.throwIfNull(relatedValue, "relatedValue");
+         relatedFields[index] = relatedValue;
+      } catch (ArgumentNullException e){
+         e.printStackTrace();
+      }
    }
    
    public int[] getNativeFieldsArray() {
@@ -43,7 +73,8 @@ public class EdgeTable {
    }
 
    public void addNativeField(int value) {
-      alNativeFields.add(new Integer(value));
+      // alNativeFields.add(new Integer(value));
+      alNativeFields.add(value);
    }
 
    public void moveFieldUp(int index) { //move the field closer to the beginning of the list
@@ -77,13 +108,12 @@ public class EdgeTable {
       for (int i = 0; i < temp.length; i++) {
          nativeFields[i] = temp[i].intValue();
       }
-      
       temp = (Integer[])alRelatedTables.toArray(new Integer[alRelatedTables.size()]);
       relatedTables = new int[temp.length];
       for (int i = 0; i < temp.length; i++) {
          relatedTables[i] = temp[i].intValue();
       }
-      
+
       relatedFields = new int[nativeFields.length];
       for (int i = 0; i < relatedFields.length; i++) {
          relatedFields[i] = 0;

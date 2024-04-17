@@ -2,7 +2,12 @@ import java.io.*;
 import java.util.*;
 import javax.swing.*;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 public class EdgeConvertFileParser {
+   private static final Logger logger = LogManager.getLogger(EdgeConvertFileParser.class);
+
    //private String filename = "test.edg";
    private File parseFile;
    private FileReader fr;
@@ -40,6 +45,7 @@ public class EdgeConvertFileParser {
    }
 
    public void parseEdgeFile() throws IOException {
+      //We're going to eventually refactor this entire method. It's big, clunky, and hard to understand.
       while ((currentLine = br.readLine()) != null) {
          currentLine = currentLine.trim();
          if (currentLine.startsWith("Figure ")) { //this is the start of a Figure entry
@@ -299,16 +305,19 @@ public class EdgeConvertFileParser {
                br.close();
                this.makeArrays(); //convert ArrayList objects into arrays of the appropriate Class type
             } else { //the file chosen is something else
+               logger.warn("File: \'"+inputFile.getName()+"\' is not a recognized file format.");
                JOptionPane.showMessageDialog(null, "Unrecognized file format");
             }
          }
       } // try
       catch (FileNotFoundException fnfe) {
-         System.out.println("Cannot find \"" + inputFile.getName() + "\".");
+         logger.error("Cannot find \"" + inputFile.getName() + "\".");
+         logger.debug("stacktrace:\n"+fnfe.getStackTrace());
          System.exit(0);
       } // catch FileNotFoundException
       catch (IOException ioe) {
-         System.out.println(ioe);
+         logger.error("Experienced an Input/Output exception. Error:\n"+
+         ioe+"\n\nstacktrace:\n"+ioe.getStackTrace());
          System.exit(0);
       } // catch IOException
    } // openFile()

@@ -1,17 +1,34 @@
 import java.util.StringTokenizer;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+
 public class EdgeConnector {
+
+   private static final Logger logger = LogManager.getLogger(EdgeConnector.class);
    private int numConnector, endPoint1, endPoint2;
    private String endStyle1, endStyle2;
    private boolean isEP1Field, isEP2Field, isEP1Table, isEP2Table;
       
    public EdgeConnector(String inputString) {
       StringTokenizer st = new StringTokenizer(inputString, EdgeConvertFileParser.DELIM);
-      numConnector = Integer.parseInt(st.nextToken());
-      endPoint1 = Integer.parseInt(st.nextToken());
-      endPoint2 = Integer.parseInt(st.nextToken());
-      endStyle1 = st.nextToken();
-      endStyle2 = st.nextToken();
+      try {
+         try{
+            numConnector = Integer.parseInt(st.nextToken());
+            endPoint1 = Integer.parseInt(st.nextToken());
+            endPoint2 = Integer.parseInt(st.nextToken());
+         } catch (IllegalArgumentException ex){
+            logger.error("Attempted to parse a non-integer token when creating"+
+            EdgeConnector.class +
+            ". \nException Caught: "+ex+",\r\nstacktrace: \n"+ex.getStackTrace());
+         }
+         endStyle1 = st.nextToken();
+         endStyle2 = st.nextToken();
+      } catch (ArrayIndexOutOfBoundsException e){
+         logger.error("Error in "+EdgeConnector.class+" constructor. \nInput contained too few characters. "+
+         "\nException Caught: "+e+"\nstacktrace: \n"+e.getStackTrace());
+      }
       isEP1Field = false;
       isEP2Field = false;
       isEP1Table = false;
