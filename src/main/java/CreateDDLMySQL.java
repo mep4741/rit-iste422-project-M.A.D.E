@@ -27,6 +27,9 @@ public class CreateDDLMySQL extends EdgeConvertCreateDDL {
       
    }
    
+   /**
+    * Creates the necessary file to create the requisite SQL database.
+    */
    public void createDDL() {
       EdgeConvertGUI.setReadSuccess(true);
       databaseName = generateDatabaseName();
@@ -34,9 +37,9 @@ public class CreateDDLMySQL extends EdgeConvertCreateDDL {
       sb.append("CREATE DATABASE " + databaseName + ";\r\n");
       sb.append("USE " + databaseName + ";\r\n");
       for (int boundCount = 0; boundCount <= maxBound; boundCount++) { //process tables in order from least dependent (least number of bound tables) to most dependent
-         for (int tableCount = 0; tableCount < numBoundTables.length; tableCount++) { //step through list of tables
-            if (numBoundTables[tableCount] == boundCount) { //
-               createTable(tableCount);
+         for (int i = 0; i < numBoundTables.length; i++) { //step through list of tables
+            if (numBoundTables[i] == boundCount) { //
+               createTable(i);
             }
          }
       }
@@ -90,17 +93,14 @@ public class CreateDDLMySQL extends EdgeConvertCreateDDL {
    }
 
 
-   private void addFKConstraints(){
-
-   }
 
    /**
     * Adds the sql commands to create a necessary table and add them to the string
     * builder.
     * @param tableCount
     */
-   private void createTable(int tableCount){
-      EdgeTable table = tables[tableCount]; //Table to be converted into SQL statements
+   private void createTable(int tableNum){
+      EdgeTable table = tables[tableNum]; //Table to be converted into SQL statements
       sb.append("CREATE TABLE " + table.getName() + " (\r\n");
                int[] nativeFields = table.getNativeFieldsArray();
                int[] relatedFields = table.getRelatedFieldsArray();
@@ -133,9 +133,9 @@ public class CreateDDLMySQL extends EdgeConvertCreateDDL {
                      numForeignKey++;
                   }
                   sb.append(",\r\n"); //end of field
-               }
+               }//for end
                if (numPrimaryKey > 0) { //table has primary key(s)
-                  sb.append("CONSTRAINT " + tables[tableCount].getName() + "_PK PRIMARY KEY (");
+                  sb.append("CONSTRAINT " + tables[tableNum].getName() + "_PK PRIMARY KEY (");
                   for (int i = 0; i < primaryKey.length; i++) {
                      if (primaryKey[i]) {
                         sb.append(getField(nativeFields[i]).getName());
@@ -155,7 +155,7 @@ public class CreateDDLMySQL extends EdgeConvertCreateDDL {
                   int currentFK = 1;
                   for (int i = 0; i < relatedFields.length; i++) {
                      if (relatedFields[i] != 0) {
-                        sb.append("CONSTRAINT " + tables[tableCount].getName() + "_FK" + currentFK +
+                        sb.append("CONSTRAINT " + tables[tableNum].getName() + "_FK" + currentFK +
                                   " FOREIGN KEY(" + getField(nativeFields[i]).getName() + ") REFERENCES " +
                                   getTable(getField(nativeFields[i]).getTableBound()).getName() + "(" + getField(relatedFields[i]).getName() + ")");
                         if (currentFK < numForeignKey) {
@@ -167,6 +167,14 @@ public class CreateDDLMySQL extends EdgeConvertCreateDDL {
                   sb.append("\r\n");
                }
                sb.append(");\r\n\r\n"); //end of table
+   }//CreateSQLTable
+
+   /**
+    * Append sql statements to create the necessary fields for a given table.
+    * @param table
+    */
+   private void addFields(EdgeTable table){
+
    }
    
 }//EdgeConvertCreateDDL
