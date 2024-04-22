@@ -194,7 +194,7 @@ public class CreateDDLMySQL extends EdgeConvertCreateDDL {
          EdgeField relatedField = getField(relatedFieldNumber);
          if (relatedFieldNumber != 0) {
             sb.append("CONSTRAINT " + tableName + "_FK" + fkNumber);
-            sb.append(" FOREIGN KEY(" + nativeField.getName() + ") REFERENCES ");
+            sb.append(" FOREIGN KEY (" + nativeField.getName() + ") REFERENCES ");
             sb.append(getTable(nativeField.getTableBound()).getName() + "(" + relatedField.getName() + ")");
          }
       }//for loop
