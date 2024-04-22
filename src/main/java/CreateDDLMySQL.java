@@ -36,7 +36,66 @@ public class CreateDDLMySQL extends EdgeConvertCreateDDL {
       for (int boundCount = 0; boundCount <= maxBound; boundCount++) { //process tables in order from least dependent (least number of bound tables) to most dependent
          for (int tableCount = 0; tableCount < numBoundTables.length; tableCount++) { //step through list of tables
             if (numBoundTables[tableCount] == boundCount) { //
-               sb.append("CREATE TABLE " + tables[tableCount].getName() + " (\r\n");
+               createTable(tableCount);
+            }
+         }
+      }
+      logger.debug("--- SQL commands ---\r\n"+sb.toString());
+   }
+
+   protected int convertStrBooleanToInt(String input) { //MySQL uses '1' and '0' for boolean types
+      if (input.equals("true")) {
+         return 1;
+      } else {
+         return 0;
+      }
+   }
+   
+   public String generateDatabaseName() { //prompts user for database name
+      String dbNameDefault = "MySQLDB";
+      //String databaseName = "";
+
+      do {
+         databaseName = (String)JOptionPane.showInputDialog(
+                       null,
+                       "Enter the database name:",
+                       "Database Name",
+                       JOptionPane.PLAIN_MESSAGE,
+                       null,
+                       null,
+                       dbNameDefault);
+         if (databaseName == null) {
+            EdgeConvertGUI.setReadSuccess(false);
+            return "";
+         }
+         if (databaseName.equals("")) {
+            logger.warn("You must select a name for your database.");
+            JOptionPane.showMessageDialog(null, "You must select a name for your database.");
+         }
+      } while (databaseName.equals(""));
+      return databaseName;
+   }
+   
+   public String getDatabaseName() {
+      return databaseName;
+   }
+   
+   public String getProductName() {
+      return "MySQL";
+   }
+
+   public String getSQLString() {
+      createDDL();
+      return sb.toString(); //output of get ddl
+   }
+
+
+   private void addFKConstraints(){
+
+   }
+
+   private void createTable(int tableCount){
+      sb.append("CREATE TABLE " + tables[tableCount].getName() + " (\r\n");
                int[] nativeFields = tables[tableCount].getNativeFieldsArray();
                int[] relatedFields = tables[tableCount].getRelatedFieldsArray();
                boolean[] primaryKey = new boolean[nativeFields.length];
@@ -102,56 +161,6 @@ public class CreateDDLMySQL extends EdgeConvertCreateDDL {
                   sb.append("\r\n");
                }
                sb.append(");\r\n\r\n"); //end of table
-            }
-         }
-      }
-      logger.debug("--- SQL commands ---\r\n"+sb.toString());
-   }
-
-   protected int convertStrBooleanToInt(String input) { //MySQL uses '1' and '0' for boolean types
-      if (input.equals("true")) {
-         return 1;
-      } else {
-         return 0;
-      }
-   }
-   
-   public String generateDatabaseName() { //prompts user for database name
-      String dbNameDefault = "MySQLDB";
-      //String databaseName = "";
-
-      do {
-         databaseName = (String)JOptionPane.showInputDialog(
-                       null,
-                       "Enter the database name:",
-                       "Database Name",
-                       JOptionPane.PLAIN_MESSAGE,
-                       null,
-                       null,
-                       dbNameDefault);
-         if (databaseName == null) {
-            EdgeConvertGUI.setReadSuccess(false);
-            return "";
-         }
-         if (databaseName.equals("")) {
-            logger.warn("You must select a name for your database.");
-            JOptionPane.showMessageDialog(null, "You must select a name for your database.");
-         }
-      } while (databaseName.equals(""));
-      return databaseName;
-   }
-   
-   public String getDatabaseName() {
-      return databaseName;
-   }
-   
-   public String getProductName() {
-      return "MySQL";
-   }
-
-   public String getSQLString() {
-      createDDL();
-      return sb.toString(); //output of get ddl
    }
    
 }//EdgeConvertCreateDDL
