@@ -60,7 +60,6 @@ public class CreateDDLMySQLTest {
     }
 
     @Test
-
     public void testSQLStringExistence(){
         assertNotNull("SQLString should exist by default upon creation of CreateDDLMySQL object.", testSQLString);
     }
