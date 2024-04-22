@@ -4,6 +4,7 @@ import javax.swing.*;
 import javax.swing.event.*;
 import java.io.*;
 import java.util.*;
+import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -17,6 +18,7 @@ public class CreateDDLMySQL extends EdgeConvertCreateDDL {
    //this array is for determining how MySQL refers to datatypes
    protected String[] strDataType = {"VARCHAR", "BOOL", "INT", "DOUBLE"};
    protected StringBuffer sb;
+
 
    public CreateDDLMySQL(EdgeTable[] inputTables, EdgeField[] inputFields) {
       super(inputTables, inputFields);
@@ -105,77 +107,97 @@ public class CreateDDLMySQL extends EdgeConvertCreateDDL {
       sb.append("CREATE TABLE " + table.getName() + " (\r\n");
                int[] nativeFields = table.getNativeFieldsArray();
                int[] relatedFields = table.getRelatedFieldsArray();
-               boolean[] primaryKey = new boolean[nativeFields.length];
-               int numPrimaryKey = 0;
-               int numForeignKey = 0;
-               for (int nativeFieldCount = 0; nativeFieldCount < nativeFields.length; nativeFieldCount++) { //print out the fields
-                  EdgeField currentField = getField(nativeFields[nativeFieldCount]);
-                  sb.append("\t" + currentField.getName() + " " + strDataType[currentField.getDataType()]);
-                  if (currentField.getDataType() == 0) { //varchar
-                     sb.append("(" + currentField.getVarcharValue() + ")"); //append varchar length in () if data type is varchar
-                  }
-                  if (currentField.getDisallowNull()) {
-                     sb.append(" NOT NULL");
-                  }
-                  if (!currentField.getDefaultValue().equals("")) {
-                     if (currentField.getDataType() == 1) { //boolean data type
-                        sb.append(" DEFAULT " + convertStrBooleanToInt(currentField.getDefaultValue()));
-                     } else { //any other data type
-                        sb.append(" DEFAULT " + currentField.getDefaultValue());
-                     }
-                  }
-                  if (currentField.getIsPrimaryKey()) {
-                     primaryKey[nativeFieldCount] = true;
-                     numPrimaryKey++;
-                  } else {
-                     primaryKey[nativeFieldCount] = false;
-                  }
-                  if (currentField.getFieldBound() != 0) {
-                     numForeignKey++;
-                  }
-                  sb.append(",\r\n"); //end of field
-               }//for end
-               if (numPrimaryKey > 0) { //table has primary key(s)
-                  sb.append("CONSTRAINT " + tables[tableNum].getName() + "_PK PRIMARY KEY (");
-                  for (int i = 0; i < primaryKey.length; i++) {
-                     if (primaryKey[i]) {
-                        sb.append(getField(nativeFields[i]).getName());
-                        numPrimaryKey--;
-                        if (numPrimaryKey > 0) {
-                           sb.append(", ");
-                        }
-                     }
-                  }
-                  sb.append(")");
-                  if (numForeignKey > 0) {
-                     sb.append(",");
-                  }
-                  sb.append("\r\n");
+
+               LinkedList<EdgeField> primaryKeys = addNativeFields(nativeFields); //A list of all primary keys.
+
+               if (primaryKeys.size() > 0) {
+                  addPrimaryKeyConstraints(primaryKeys, table.getName());
                }
-               if (numForeignKey > 0) { //table has foreign keys
-                  int currentFK = 1;
-                  for (int i = 0; i < relatedFields.length; i++) {
-                     if (relatedFields[i] != 0) {
-                        sb.append("CONSTRAINT " + tables[tableNum].getName() + "_FK" + currentFK +
-                                  " FOREIGN KEY(" + getField(nativeFields[i]).getName() + ") REFERENCES " +
-                                  getTable(getField(nativeFields[i]).getTableBound()).getName() + "(" + getField(relatedFields[i]).getName() + ")");
-                        if (currentFK < numForeignKey) {
-                           sb.append(",\r\n");
-                        }
-                        currentFK++;
-                     }
-                  }
-                  sb.append("\r\n");
-               }
-               sb.append(");\r\n\r\n"); //end of table
+
+               addForeignKeyConstraints(nativeFields, relatedFields, databaseName);
+
+               sb.append("\r\n);\r\n\r\n"); //end of table
    }//CreateSQLTable
 
    /**
     * Append sql statements to create the native fields for a given table.
-    * @param table
+    * @param nativeFields - an array of all the native field numbers
+    * @return a LinkedList<EdgeField> containing all primary key fields.
     */
-   private void addNativeFields(EdgeTable table){
+   private LinkedList<EdgeField> addNativeFields(int[] nativeFields){
+      LinkedList<EdgeField> pKeys = new LinkedList<EdgeField>(); //A list of all the primary keys.
+      for (int i = 0; i < nativeFields.length; i++) { //print out the fields
+         EdgeField currentField = getField(nativeFields[i]);
+         sb.append("\t" + currentField.getName() + " " + strDataType[currentField.getDataType()]);
+         if (currentField.getDataType() == 0) { //varchar
+            sb.append("(" + currentField.getVarcharValue() + ")"); //append varchar length in () if data type is varchar
+         }
+         if (currentField.getDisallowNull()) {
+            sb.append(" NOT NULL");
+         }
+         if (!currentField.getDefaultValue().equals("")) {
+            if (currentField.getDataType() == 1) { //boolean data type
+               sb.append(" DEFAULT " + convertStrBooleanToInt(currentField.getDefaultValue()));
+            } else { //any other data type
+               sb.append(" DEFAULT " + currentField.getDefaultValue());
+            }
+         }
+         //Store this field as a primary key.
+         if (currentField.getIsPrimaryKey()) {
+            pKeys.push(currentField);
+         }
+         //Only add commas and line separators for each field other than the last
+         if (i < nativeFields.length - 1) {
+            sb.append(",\r\n");
+         }
+         //end of field
+      }//for end
+      return pKeys;
+   }//addNativeFields
 
-   }
+   /**
+    * Adds primary key constraints
+    * @param primaryKeys
+    * @param tableName
+    */
+   private void addPrimaryKeyConstraints(LinkedList<EdgeField> primaryKeys, String tableName){
+      sb.append(",\r\n"); //Append a comma and a line break
+      sb.append("CONSTRAINT " + tableName + "_PK PRIMARY KEY (");
+      Iterator<EdgeField> iter = primaryKeys.iterator();
+      while (iter.hasNext()) {
+         EdgeField currentField = iter.next();
+         sb.append(currentField.getName());
+         //If there are more primary keys, add commas between them.
+         if (iter.hasNext()) {
+            sb.append(", ");
+         }
+      }//End of while loop
+      sb.append(")"); //no more primary keys to add
+   }//addPrimaryKeyConstraints
+
+
+   /**
+    * Adds foreign key constraints to a table, if there are any.
+    * @param nativeFieldNums
+    * @param relatedFieldNums
+    * @param tableName
+    */
+   private void addForeignKeyConstraints(int[] nativeFieldNums, int[] relatedFieldNums, String tableName){
+      
+      int len = relatedFieldNums.length;
+      for(int i = 0; i< len; i++){
+         sb.append(",\r\n"); //Create a new line
+         int relatedFieldNumber = relatedFieldNums[i];
+         int fkNumber = i+1;
+
+         EdgeField nativeField = getField(nativeFieldNums[i]);//The nativefield the foreignkey is related to.
+         EdgeField relatedField = getField(relatedFieldNumber);
+         if (relatedFieldNumber != 0) {
+            sb.append("CONSTRAINT " + tableName + "_FK" + fkNumber);
+            sb.append(" FOREIGN KEY(" + nativeField.getName() + ") REFERENCES ");
+            sb.append(getTable(nativeField.getTableBound()).getName() + "(" + relatedField.getName() + ")");
+         }
+      }//for loop
+   }//addForeignKeyConstraints
    
 }//EdgeConvertCreateDDL
