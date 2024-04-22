@@ -34,6 +34,7 @@ public class CreateDDLMySQL extends EdgeConvertCreateDDL {
       EdgeConvertGUI.setReadSuccess(true);
       databaseName = generateDatabaseName();
       logger.info("Beginning Database Creation...");
+      sb.append("DROP DATABASE IF EXISTS "+databaseName+";\r\n");
       sb.append("CREATE DATABASE " + databaseName + ";\r\n");
       sb.append("USE " + databaseName + ";\r\n");
       for (int boundCount = 0; boundCount <= maxBound; boundCount++) { //process tables in order from least dependent (least number of bound tables) to most dependent
@@ -170,10 +171,10 @@ public class CreateDDLMySQL extends EdgeConvertCreateDDL {
    }//CreateSQLTable
 
    /**
-    * Append sql statements to create the necessary fields for a given table.
+    * Append sql statements to create the native fields for a given table.
     * @param table
     */
-   private void addFields(EdgeTable table){
+   private void addNativeFields(EdgeTable table){
 
    }
    
