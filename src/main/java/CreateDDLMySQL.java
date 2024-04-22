@@ -94,10 +94,16 @@ public class CreateDDLMySQL extends EdgeConvertCreateDDL {
 
    }
 
+   /**
+    * Adds the sql commands to create a necessary table and add them to the string
+    * builder.
+    * @param tableCount
+    */
    private void createTable(int tableCount){
-      sb.append("CREATE TABLE " + tables[tableCount].getName() + " (\r\n");
-               int[] nativeFields = tables[tableCount].getNativeFieldsArray();
-               int[] relatedFields = tables[tableCount].getRelatedFieldsArray();
+      EdgeTable table = tables[tableCount]; //Table to be converted into SQL statements
+      sb.append("CREATE TABLE " + table.getName() + " (\r\n");
+               int[] nativeFields = table.getNativeFieldsArray();
+               int[] relatedFields = table.getRelatedFieldsArray();
                boolean[] primaryKey = new boolean[nativeFields.length];
                int numPrimaryKey = 0;
                int numForeignKey = 0;
